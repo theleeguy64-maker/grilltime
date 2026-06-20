@@ -1,0 +1,13 @@
+{
+  "name": "GrillTime",
+  "short_name": "GrillTime",
+  "description": "Back-timed meal planner — everything ready at serve time.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#12122a",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

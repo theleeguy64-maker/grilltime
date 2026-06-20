@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#12122a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GrillTime">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+  <title>GrillTime</title>
+</head>
+<body>
+  <header>
+    <h1><span class="flame">&#128293;</span> GrillTime</h1>
+  </header>
+
+  <main>
+    <section id="controls">
+      <div class="control-row">
+        <div class="field">
+          <label for="serve-time">Serve at</label>
+          <input type="time" id="serve-time">
+        </div>
+        <div class="field">
+          <label for="buffer">Finish early (min)</label>
+          <input type="number" id="buffer" min="0" max="120" step="1" inputmode="numeric" value="0">
+        </div>
+      </div>
+    </section>
+
+    <div id="headline">Add a dish to build your schedule</div>
+
+    <section id="schedule-section">
+      <h2>Schedule</h2>
+      <div id="schedule"></div>
+    </section>
+
+    <section id="add-section">
+      <button id="show-add" class="primary" style="width:100%">+ Add dish</button>
+      <div id="add-form" class="hidden">
+        <div class="field" id="f-name">
+          <label for="d-name">Dish name</label>
+          <input type="text" id="d-name" maxlength="40" placeholder="e.g. Ribeye" autocomplete="off">
+          <div class="err-msg" id="e-name"></div>
+        </div>
+        <div class="form-grid">
+          <div class="field" id="f-prep">
+            <label for="d-prep">Prep (min)</label>
+            <input type="number" id="d-prep" min="0" max="1440" step="1" inputmode="numeric" placeholder="0">
+            <div class="err-msg" id="e-prep"></div>
+          </div>
+          <div class="field" id="f-cook">
+            <label for="d-cook">Cook (min)</label>
+            <input type="number" id="d-cook" min="1" max="1440" step="1" inputmode="numeric" placeholder="12">
+            <div class="err-msg" id="e-cook"></div>
+          </div>
+          <div class="field" id="f-rest">
+            <label for="d-rest">Rest (min)</label>
+            <input type="number" id="d-rest" min="0" max="1440" step="1" inputmode="numeric" placeholder="0">
+            <div class="err-msg" id="e-rest"></div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button id="cancel-add">Cancel</button>
+          <button id="save-dish" class="primary">Save dish</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="saved-section">
+      <h2>Saved dishes</h2>
+      <div id="saved-list"></div>
+    </section>
+  </main>
+
+  <!-- Classic scripts only — NO modules (file:// safe). Order matters. -->
+  <script src="timing.js"></script>
+  <script src="storage.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
