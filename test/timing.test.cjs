@@ -6,7 +6,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const T = require('../web/timing.js');
+const T = require('../timing.js');
 
 // Helper: build a Date at HH:MM on a fixed reference day (2026-06-20).
 function at(h, m = 0) {

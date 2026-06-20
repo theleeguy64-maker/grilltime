@@ -2,7 +2,7 @@
 import sys, pathlib
 from playwright.sync_api import sync_playwright
 
-INDEX = pathlib.Path(__file__).resolve().parent.parent / "web" / "index.html"
+INDEX = pathlib.Path(__file__).resolve().parent.parent / "index.html"
 URL = INDEX.as_uri()  # file:// URL
 
 failures = []
