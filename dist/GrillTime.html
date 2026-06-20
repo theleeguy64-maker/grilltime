@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#12122a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GrillTime">
+  <meta name="mobile-web-app-capable" content="yes">
+  <style>
+:root {
+  --bg-body: #1a1a2e;
+  --bg-toolbar: #12122a;
+  --bg-card: #16213e;
+  --bg-card-hover: #1a2a4a;
+  --bg-input: #0f0f23;
+  --bg-button: #1e1e3a;
+  --bg-button-hover: #2a2a50;
+  --accent: #7b68ee;
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --text-muted: #888;
+  --text-brand: #fff;
+  --border: #333;
+  --border-light: #444;
+  --border-hover: #666;
+  --color-pick: #4ade80;
+  --color-reject: #f87171;
+  --color-save: #4ade80;
+  --color-toast: #4ade80;
+  --color-link: #60a5fa;
+  --color-title: #93bbfc;
+  /* Semantic surface hierarchy (use in new projects) */
+  --bg-surface: var(--bg-card);
+  --bg-elevated: var(--bg-card-hover);
+  --accent-dim: #5a4ebe;
+  --text-dim: #666;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+body {
+  padding:
+    env(safe-area-inset-top) env(safe-area-inset-right)
+    calc(env(safe-area-inset-bottom) + 16px) env(safe-area-inset-left);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  background: var(--bg-toolbar);
+  padding: 14px 16px calc(14px + env(safe-area-inset-top));
+  margin: calc(-1 * env(safe-area-inset-top)) calc(-1 * env(safe-area-inset-left)) 0 calc(-1 * env(safe-area-inset-left));
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+header h1 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-brand);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+header h1 .flame { color: var(--accent); }
+
+main { padding: 16px; }
+section { margin-bottom: 22px; }
+h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); margin: 0 0 10px; }
+
+/* --- Controls --- */
+.control-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 110px; }
+.field label { font-size: 13px; color: var(--text-secondary); }
+
+input[type="time"], input[type="number"], input[type="text"] {
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 17px;
+  min-height: 48px;
+  width: 100%;
+}
+input:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+.field-error input { border-color: var(--color-reject); }
+.err-msg { color: var(--color-reject); font-size: 12px; min-height: 0; }
+
+button {
+  background: var(--bg-button);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 16px;
+  min-height: 48px;
+  min-width: 48px;
+  cursor: pointer;
+}
+button:hover { background: var(--bg-button-hover); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+button.primary:hover { background: var(--accent-dim); }
+button.danger { color: var(--color-reject); border-color: transparent; background: transparent; padding: 8px 10px; }
+
+/* --- Headline --- */
+#headline {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 19px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 18px;
+}
+#headline.behind { color: var(--color-reject); border-color: var(--color-reject); }
+#headline.past { color: var(--accent); }
+
+/* --- Schedule rows --- */
+.dish-row {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.dish-row.late { border-color: var(--color-reject); background: #2a1620; }
+.dish-row .info { flex: 1; }
+.dish-row .name { font-weight: 600; font-size: 17px; margin-bottom: 4px; }
+.dish-row .stages { font-size: 14px; color: var(--text-secondary); }
+.dish-row .stages .at { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.dish-row .late-badge { color: var(--color-reject); font-size: 13px; font-weight: 600; margin-top: 4px; }
+.dish-row .row-actions { display: flex; flex-direction: column; gap: 4px; }
+
+/* --- Empty / past states --- */
+.empty, .past-state {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 30px 16px;
+  border: 1px dashed var(--border-light);
+  border-radius: 12px;
+}
+.past-state { color: var(--accent); border-color: var(--accent-dim); }
+
+/* --- Saved dishes --- */
+.saved-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--bg-elevated); border: 1px solid var(--border-light);
+  border-radius: 20px; padding: 8px 8px 8px 14px; margin: 0 8px 8px 0;
+}
+.saved-chip button.add-chip { background: transparent; border: none; color: var(--text-primary); padding: 4px; min-height: 36px; }
+.saved-chip button.del-chip { background: transparent; border: none; color: var(--color-reject); padding: 6px 8px; min-height: 44px; min-width: 44px; font-size: 18px; }
+
+/* --- Add form --- */
+#add-form { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+#add-form.hidden, .hidden { display: none; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 10px 0; }
+.form-grid .field { min-width: 0; }
+.form-actions { display: flex; gap: 10px; }
+.form-actions button { flex: 1; }
+
+  </style>
+  <title>GrillTime</title>
+</head>
+<body>
+  <header>
+    <h1><span class="flame">&#128293;</span> GrillTime</h1>
+  </header>
+
+  <main>
+    <section id="controls">
+      <div class="control-row">
+        <div class="field">
+          <label for="serve-time">Serve at</label>
+          <input type="time" id="serve-time">
+        </div>
+        <div class="field">
+          <label for="buffer">Finish early (min)</label>
+          <input type="number" id="buffer" min="0" max="120" step="1" inputmode="numeric" value="0">
+        </div>
+      </div>
+    </section>
+
+    <div id="headline">Add a dish to build your schedule</div>
+
+    <section id="schedule-section">
+      <h2>Schedule</h2>
+      <div id="schedule"></div>
+    </section>
+
+    <section id="add-section">
+      <button id="show-add" class="primary" style="width:100%">+ Add dish</button>
+      <div id="add-form" class="hidden">
+        <div class="field" id="f-name">
+          <label for="d-name">Dish name</label>
+          <input type="text" id="d-name" maxlength="40" placeholder="e.g. Ribeye" autocomplete="off">
+          <div class="err-msg" id="e-name"></div>
+        </div>
+        <div class="form-grid">
+          <div class="field" id="f-prep">
+            <label for="d-prep">Prep (min)</label>
+            <input type="number" id="d-prep" min="0" max="1440" step="1" inputmode="numeric" placeholder="0">
+            <div class="err-msg" id="e-prep"></div>
+          </div>
+          <div class="field" id="f-cook">
+            <label for="d-cook">Cook (min)</label>
+            <input type="number" id="d-cook" min="1" max="1440" step="1" inputmode="numeric" placeholder="12">
+            <div class="err-msg" id="e-cook"></div>
+          </div>
+          <div class="field" id="f-rest">
+            <label for="d-rest">Rest (min)</label>
+            <input type="number" id="d-rest" min="0" max="1440" step="1" inputmode="numeric" placeholder="0">
+            <div class="err-msg" id="e-rest"></div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button id="cancel-add">Cancel</button>
+          <button id="save-dish" class="primary">Save dish</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="saved-section">
+      <h2>Saved dishes</h2>
+      <div id="saved-list"></div>
+    </section>
+  </main>
+  <script>
+'use strict';
+/*
+ * GrillTime timing engine — PURE functions, zero DOM.
+ *
+ * Dual-consumer (spec Architecture note): loaded in the browser as a CLASSIC <script>
+ * (attaches window.GrillTiming) and required by Node tests via module.exports.
+ * NO browser import/export — those break over file://.
+ */
+(function (root) {
+  const MIN = 60 * 1000;
+
+  function minutesBefore(date, mins) {
+    return new Date(date.getTime() - mins * MIN);
+  }
+
+  /**
+   * computeSchedule — back-time every dish so its rest ends at the effective deadline.
+   * @param serveTime Date  target serve moment S
+   * @param bufferMin int   finish everything bufferMin minutes early (D = S - buffer)
+   * @param dishes [{id,name,prep,cook,rest}]  prep/rest may be 0
+   * @param now Date        injected for determinism
+   */
+  function computeSchedule({ serveTime, bufferMin = 0, dishes = [], now }) {
+    const deadline = minutesBefore(serveTime, bufferMin);
+    const serveInPast = serveTime.getTime() <= now.getTime();
+
+    const rows = dishes.map(function (d) {
+      const prep = d.prep || 0;
+      const cook = d.cook || 0;
+      const rest = d.rest || 0;
+      const restStart = minutesBefore(deadline, rest);
+      const cookStart = minutesBefore(restStart, cook);
+      const prepStart = prep > 0 ? minutesBefore(cookStart, prep) : null;
+      const firstAction = prepStart || cookStart;
+      const late = firstAction.getTime() < now.getTime();
+      const lateByMin = late
+        ? Math.round((now.getTime() - firstAction.getTime()) / MIN)
+        : 0;
+      return {
+        id: d.id,
+        name: d.name,
+        prepStart: prepStart,
+        cookStart: cookStart,
+        restStart: restStart,
+        firstAction: firstAction,
+        serveAt: deadline,
+        late: late,
+        lateByMin: lateByMin,
+      };
+    });
+
+    rows.sort(function (a, b) {
+      return a.firstAction.getTime() - b.firstAction.getTime();
+    });
+
+    const mealStart = rows.length ? rows[0].firstAction : null;
+    const lateCount = rows.filter(function (r) { return r.late; }).length;
+
+    return { deadline, mealStart, serveInPast, lateCount, rows };
+  }
+
+  /** Format a positive minute delta for the late-by reason (spec M1). */
+  function formatDelta(mins) {
+    mins = Math.max(0, Math.round(mins));
+    if (mins < 60) return mins + 'm';
+    if (mins < 1440) return Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm';
+    const days = Math.floor(mins / 1440);
+    const hours = Math.floor((mins % 1440) / 60);
+    return days + 'd ' + hours + 'h';
+  }
+
+  /** Coerce + validate one numeric field. Returns {ok, value} or {ok:false, error}. */
+  function validateNum(raw, { min, max, name, allowEmpty }) {
+    if (raw === '' || raw === null || raw === undefined) {
+      if (allowEmpty) return { ok: true, value: 0 };
+      return { ok: false, error: name + ' is required' };
+    }
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return { ok: false, error: name + ' must be a number' };
+    const v = Math.round(n);
+    if (v < min || v > max) return { ok: false, error: name + ' must be ' + min + '–' + max };
+    return { ok: true, value: v };
+  }
+
+  /**
+   * validateDish — spec validation: name 1–40 trimmed; cook 1–1440; prep/rest 0–1440
+   * (empty → 0); decimals round; NaN/negative/out-of-range rejected.
+   * Returns {ok:true, value:{name,prep,cook,rest}} or {ok:false, errors:{field:msg}}.
+   */
+  function validateDish(d) {
+    const errors = {};
+    const name = (d.name == null ? '' : String(d.name)).trim();
+    if (name.length < 1) errors.name = 'Name is required';
+    else if (name.length > 40) errors.name = 'Name must be 1–40 characters';
+
+    const cook = validateNum(d.cook, { min: 1, max: 1440, name: 'Cook', allowEmpty: false });
+    if (!cook.ok) errors.cook = cook.error;
+    const prep = validateNum(d.prep, { min: 0, max: 1440, name: 'Prep', allowEmpty: true });
+    if (!prep.ok) errors.prep = prep.error;
+    const rest = validateNum(d.rest, { min: 0, max: 1440, name: 'Rest', allowEmpty: true });
+    if (!rest.ok) errors.rest = rest.error;
+
+    if (Object.keys(errors).length) return { ok: false, errors };
+    return { ok: true, value: { name, prep: prep.value, cook: cook.value, rest: rest.value } };
+  }
+
+  const api = { computeSchedule, formatDelta, validateDish };
+
+  // Dual export — Node test (CommonJS) + browser global. No ES module syntax.
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.GrillTiming = api;
+})(typeof window !== 'undefined' ? window : this);
+
+'use strict';
+/* GrillTime persistence — localStorage. Classic script (window.GrillStore). */
+(function (root) {
+  const KEY = 'grilltime.v1';
+
+  function todayStr(d) {
+    d = d || new Date();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return d.getFullYear() + '-' + m + '-' + day;
+  }
+
+  function defaultServeTime() {
+    const t = new Date(Date.now() + 60 * 60 * 1000); // now + 1h
+    return String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0');
+  }
+
+  function emptyState() {
+    return {
+      savedDishes: [],
+      plan: [],
+      settings: { serveTime: defaultServeTime(), serveDate: todayStr(), bufferMin: 0 },
+    };
+  }
+
+  function load() {
+    let s;
+    try {
+      s = JSON.parse(root.localStorage.getItem(KEY)) || emptyState();
+    } catch (e) {
+      s = emptyState();
+    }
+    // Repair shape
+    if (!Array.isArray(s.savedDishes)) s.savedDishes = [];
+    if (!Array.isArray(s.plan)) s.plan = [];
+    if (!s.settings) s.settings = emptyState().settings;
+    // Stale serve-date reset (spec H1): if stored date isn't today, reset serve time.
+    if (s.settings.serveDate !== todayStr()) {
+      s.settings.serveTime = defaultServeTime();
+      s.settings.serveDate = todayStr();
+    }
+    if (typeof s.settings.bufferMin !== 'number' || s.settings.bufferMin < 0) {
+      s.settings.bufferMin = 0;
+    }
+    return s;
+  }
+
+  function save(state) {
+    try {
+      root.localStorage.setItem(KEY, JSON.stringify(state));
+    } catch (e) { /* storage full / private mode — non-fatal */ }
+  }
+
+  function newId() {
+    newId._c = (newId._c || 0) + 1;
+    return String(Date.now()) + '-' + newId._c;
+  }
+
+  root.GrillStore = { load, save, newId, todayStr, defaultServeTime, KEY };
+})(window);
+
+'use strict';
+/* GrillTime orchestration — DOM <-> engine <-> storage. Classic script. */
+(function () {
+  const T = window.GrillTiming;
+  const Store = window.GrillStore;
+  let state = Store.load();
+  let editingId = null; // id of plan row being edited, or null for new
+
+  const $ = (id) => document.getElementById(id);
+
+  // --- serveTime "HH:MM" -> Date today ---
+  function serveDate() {
+    const [h, m] = (state.settings.serveTime || '18:00').split(':').map(Number);
+    const d = new Date();
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
+
+  function fmtTime(date) {
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+
+  // --- Rendering ---
+  function render() {
+    const now = new Date();
+    const res = T.computeSchedule({
+      serveTime: serveDate(),
+      bufferMin: state.settings.bufferMin,
+      dishes: state.plan,
+      now,
+    });
+    renderHeadline(res);
+    renderSchedule(res);
+    renderSaved();
+  }
+
+  function renderHeadline(res) {
+    const el = $('headline');
+    el.className = '';
+    if (res.serveInPast) {
+      el.classList.add('past');
+      el.textContent = 'Serve time has already passed — pick a later time';
+      return;
+    }
+    if (!res.rows.length) {
+      el.textContent = 'Add a dish to build your schedule';
+      return;
+    }
+    if (res.lateCount > 0) {
+      el.classList.add('behind');
+      el.textContent = '⚠ ' + res.lateCount + ' dish' + (res.lateCount > 1 ? 'es' : '') + ' behind';
+      return;
+    }
+    el.textContent = 'Start cooking at ' + fmtTime(res.mealStart);
+  }
+
+  function renderSchedule(res) {
+    const wrap = $('schedule');
+    wrap.innerHTML = '';
+    if (res.serveInPast) {
+      const p = document.createElement('div');
+      p.className = 'past-state';
+      p.textContent = 'Once you pick a serve time later than now, your start-time schedule appears here.';
+      wrap.appendChild(p);
+      return;
+    }
+    if (!res.rows.length) {
+      const e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = 'No dishes yet — add one to build your schedule.';
+      wrap.appendChild(e);
+      return;
+    }
+    res.rows.forEach((row) => {
+      const planItem = state.plan.find((d) => d.id === row.id) || {};
+      const div = document.createElement('div');
+      div.className = 'dish-row' + (row.late ? ' late' : '');
+
+      const info = document.createElement('div');
+      info.className = 'info';
+      const name = document.createElement('div');
+      name.className = 'name';
+      name.textContent = planItem.name || '(unnamed)';
+      info.appendChild(name);
+
+      const stages = document.createElement('div');
+      stages.className = 'stages';
+      const parts = [];
+      if (row.prepStart) parts.push('prep <span class="at">' + fmtTime(row.prepStart) + '</span>');
+      parts.push('cook <span class="at">' + fmtTime(row.cookStart) + '</span>');
+      parts.push('serve <span class="at">' + fmtTime(row.serveAt) + '</span>');
+      stages.innerHTML = parts.join(' → ');
+      info.appendChild(stages);
+
+      if (row.late) {
+        const lb = document.createElement('div');
+        lb.className = 'late-badge';
+        lb.textContent = 'Start now — running late by ' + T.formatDelta(row.lateByMin);
+        info.appendChild(lb);
+      }
+      div.appendChild(info);
+
+      const actions = document.createElement('div');
+      actions.className = 'row-actions';
+      const edit = document.createElement('button');
+      edit.textContent = 'Edit';
+      edit.setAttribute('aria-label', 'Edit ' + (planItem.name || 'dish'));
+      edit.onclick = () => openForm(planItem);
+      const del = document.createElement('button');
+      del.className = 'danger';
+      del.textContent = 'Remove';
+      del.setAttribute('aria-label', 'Remove ' + (planItem.name || 'dish'));
+      del.onclick = () => { state.plan = state.plan.filter((d) => d.id !== row.id); persist(); };
+      actions.appendChild(edit);
+      actions.appendChild(del);
+      div.appendChild(actions);
+
+      wrap.appendChild(div);
+    });
+  }
+
+  function renderSaved() {
+    const wrap = $('saved-list');
+    wrap.innerHTML = '';
+    if (!state.savedDishes.length) {
+      const e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = 'Dishes you save show up here to reuse.';
+      wrap.appendChild(e);
+      return;
+    }
+    state.savedDishes.forEach((d) => {
+      const chip = document.createElement('span');
+      chip.className = 'saved-chip';
+      const add = document.createElement('button');
+      add.className = 'add-chip';
+      add.textContent = d.name + ' +';
+      add.setAttribute('aria-label', 'Add ' + d.name + ' to plan');
+      add.onclick = () => {
+        state.plan.push({ id: Store.newId(), name: d.name, prep: d.prep, cook: d.cook, rest: d.rest });
+        persist();
+      };
+      const del = document.createElement('button');
+      del.className = 'del-chip';
+      del.innerHTML = '&times;';
+      del.setAttribute('aria-label', 'Delete saved dish ' + d.name);
+      del.onclick = () => { state.savedDishes = state.savedDishes.filter((x) => x.id !== d.id); persist(); };
+      chip.appendChild(add);
+      chip.appendChild(del);
+      wrap.appendChild(chip);
+    });
+  }
+
+  // --- Add/edit form ---
+  function openForm(planItem) {
+    editingId = planItem && planItem.id ? planItem.id : null;
+    $('d-name').value = planItem ? planItem.name : '';
+    $('d-prep').value = planItem && planItem.prep ? planItem.prep : '';
+    $('d-cook').value = planItem ? planItem.cook : '';
+    $('d-rest').value = planItem && planItem.rest ? planItem.rest : '';
+    clearErrors();
+    $('add-form').classList.remove('hidden');
+    $('show-add').classList.add('hidden');
+    $('d-name').focus();
+  }
+  function closeForm() {
+    $('add-form').classList.add('hidden');
+    $('show-add').classList.remove('hidden');
+    editingId = null;
+  }
+  function clearErrors() {
+    ['name', 'prep', 'cook', 'rest'].forEach((f) => {
+      $('e-' + f).textContent = '';
+      $('f-' + f).classList.remove('field-error');
+    });
+  }
+
+  function saveDish() {
+    clearErrors();
+    const v = T.validateDish({
+      name: $('d-name').value,
+      prep: $('d-prep').value,
+      cook: $('d-cook').value,
+      rest: $('d-rest').value,
+    });
+    if (!v.ok) {
+      Object.keys(v.errors).forEach((f) => {
+        $('e-' + f).textContent = v.errors[f];
+        $('f-' + f).classList.add('field-error');
+      });
+      return;
+    }
+    if (editingId) {
+      const item = state.plan.find((d) => d.id === editingId);
+      if (item) Object.assign(item, v.value);
+    } else {
+      state.plan.push({ id: Store.newId(), name: v.value.name, prep: v.value.prep, cook: v.value.cook, rest: v.value.rest });
+    }
+    // Save to reusable library (inline copy semantics — dedupe by name+times).
+    const dupe = state.savedDishes.some((d) =>
+      d.name === v.value.name && d.prep === v.value.prep && d.cook === v.value.cook && d.rest === v.value.rest);
+    if (!dupe) state.savedDishes.push({ id: Store.newId(), name: v.value.name, prep: v.value.prep, cook: v.value.cook, rest: v.value.rest });
+    closeForm();
+    persist();
+  }
+
+  function persist() { Store.save(state); render(); }
+
+  // --- Wire up ---
+  function init() {
+    $('serve-time').value = state.settings.serveTime;
+    $('buffer').value = state.settings.bufferMin;
+
+    $('serve-time').addEventListener('input', (e) => {
+      if (e.target.value) {
+        state.settings.serveTime = e.target.value;
+        state.settings.serveDate = Store.todayStr();
+        persist();
+      }
+    });
+    $('buffer').addEventListener('input', (e) => {
+      const n = parseInt(e.target.value, 10);
+      state.settings.bufferMin = Number.isFinite(n) && n >= 0 ? n : 0;
+      persist();
+    });
+    $('show-add').addEventListener('click', () => openForm(null));
+    $('cancel-add').addEventListener('click', closeForm);
+    $('save-dish').addEventListener('click', saveDish);
+
+    // now re-tick (spec HZ#5): re-render on focus + every 30s so late detection stays fresh.
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+    setInterval(render, 30000);
+
+    render();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+  </script>
+</body>
+</html>
