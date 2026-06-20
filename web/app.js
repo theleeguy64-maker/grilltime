@@ -236,4 +236,13 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
+
+  // Register service worker ONLY on a secure context (https / localhost).
+  // On file:// this is skipped entirely, so the local-file path never errors.
+  if ('serviceWorker' in navigator && window.isSecureContext &&
+      location.protocol !== 'file:') {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () { /* offline-only is fine */ });
+    });
+  }
 })();
